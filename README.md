@@ -1,48 +1,3 @@
----
-pretty_name: BhartiOCR
-language:
-- hi
-- ur
-- bn
-- ta
-- mr
-- te
-- gu
-- kn
-- ml
-- or
-- pa
-- as
-- ne
-- sa
-- sat
-- mni
-- sd
-- brx
-- bho
-- ks
-- gom
-- mai
-- doi
-license: apache-2.0
-task_categories:
-- image-to-text
-tags:
-- ocr
-- multilingual-ocr
-- document-ai
-- synthetic-data
-- computer-vision
-- indian-languages
-- pan-indic
-- webdataset
-- document-understanding
-- image-text
-- optical-character-recognition
-size_categories:
-- 10M<n<100M
----
-
 <div align="center">
 
 <img src="assets/hero_banner.png" alt="BhartiOCR Hero Banner" width="100%">
@@ -50,308 +5,487 @@ size_categories:
 <br/>
 
 [![Hugging Face](https://img.shields.io/badge/Hugging%20Face-BhartiOCR-0284c7.svg)](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-10b981.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License: Multiple / Other](https://img.shields.io/badge/License-Multiple%20%2F%20See%20Terms-10b981.svg)](#15-provenance--licensing)
 [![Format: POSIX WebDataset](https://img.shields.io/badge/Format-POSIX%20WebDataset%20(.tar)-f59e0b.svg)](https://github.com/webdataset/webdataset)
-[![PyTorch Streaming](https://img.shields.io/badge/PyTorch-Streaming%20DDP%20Ready-6366f1.svg)](https://pytorch.org/)
-[![Total Volume](https://img.shields.io/badge/Total%20Volume-13%2C250%2C000%20Samples-8b5cf6.svg)](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR)
-[![POSIX Shards](https://img.shields.io/badge/POSIX%20Shards-2%2C650%20Shards-10b981.svg)](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR)
-[![Languages](https://img.shields.io/badge/Languages-23%20Pan--Indic%20Languages-38bdf8.svg)](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR)
-[![Writing Systems](https://img.shields.io/badge/Writing%20Systems-12%20Distinct%20Scripts-ec4899.svg)](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR)
+[![HTTP Streamable](https://img.shields.io/badge/Streaming-HTTP%20Streamable-6366f1.svg)](#13-webdataset-structure--streaming)
+[![Total Volume](https://img.shields.io/badge/Total%20Volume-28%2C500%2C000%20Samples-8b5cf6.svg)](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR)
+[![POSIX Shards](https://img.shields.io/badge/POSIX%20Shards-5%2C700%20Shards-10b981.svg)](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR)
+[![Languages](https://img.shields.io/badge/Languages-71%20Pan--Indic%20Languages-38bdf8.svg)](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR)
+[![Writing Systems](https://img.shields.io/badge/Writing%20Systems-18%20Distinct%20Scripts-ec4899.svg)](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR)
 
 </div>
 
-# BhartiOCR
-### A Multilingual Synthetic OCR and Document Benchmark for Indian Languages
+# BhartiOCR: A Large-Scale Synthetic Corpus for Pan-Indic Document AI and Multilingual OCR
 
-**13.25M image-text pairs · 23 languages · 12 writing systems · 2,650 WebDataset shards**
+**28,500,000 paired image-text instances · 71 languages · 18 writing systems · 5,700 WebDataset shards**
 
-BhartiOCR is a large-scale synthetic dataset and benchmark designed for research in multilingual Optical Character Recognition (OCR), document layout analysis, and degradation robustness across South Asian languages. The current release (v1.0) contains **13,250,000 paired image-text instances** distributed across **23 languages** and **12 writing systems**. All samples are packaged as WebDataset-compatible POSIX `.tar` archives for direct distributed streaming into modern deep learning frameworks.
+BhartiOCR is a large-scale, controlled synthetic OCR and document dataset spanning 71 South Asian languages and 18 writing systems, designed for multilingual OCR pretraining, fine-tuning, document recognition, layout research, and controlled robustness research. BhartiOCR contains **28,500,000 paired image-text instances** distributed across **5,700 standardized WebDataset POSIX `.tar` archives** (exactly 5,000 samples per shard). All records are encoded as WebP images (`quality=85`) paired with UTF-8 JSON metadata containing token-level logical bounding coordinates, font identifiers, structural tier tags, and recorded augmentation sequences.
 
 ---
 
-## 1. Dataset Summary
+## 1. Overview
 
-| Property | Current Release Specification (v1.0) |
+BhartiOCR provides a controlled, scalable synthetic corpus to train and evaluate vision-language backbones, sequence-to-sequence OCR models (e.g., TrOCR, CRNN), and document understanding architectures (e.g., Donut, Nougat, Florence-2) across the typographic and orthographic complexity of South Asian scripts.
+
+Four structural tiers with token-level bounding coordinates in standard WebDataset format:
+* **Linguistic Purity**: Unicode NFC text buffers screened against out-of-domain foreign stopwords and non-native scripts.
+* **OpenType Complex Text Layout (CTL)**: Shaped via HarfBuzz (`uharfbuzz`) with explicit OpenType script and language tags, handling conjunct ligatures (*samyuktaksharas*), half-forms, reordering, and bidirectional text directionality (LTR Brahmic and RTL Extended Arabic).
+* **FreeType Glyph Rasterization**: Rendered via FreeType with font-metric vertical padding to mitigate diacritic truncation across upper and lower extremities.
+* **4 Structural Tiers**: Spanning isolated words/tokens (30%), single reading lines (55%), multi-line paragraph blocks (13%), and full-page broadsheet documents (2%).
+* **Physical Degradation Library**: Samples are degraded using procedural paper substrates, ink capillary bleeding, bureaucratic stamps, creases, dust noise, contrast shifts, and optical distortions.
+* **POSIX WebDataset Packaging**: Serialized into high-throughput `.tar` shards for direct HTTP streaming into training loops without local disk extraction.
+
+---
+
+## 2. Dataset Summary
+
+| Property | Dataset Specification |
 |---|---|
 | **Dataset Name** | BhartiOCR |
-| **Current Version** | v1.0 |
-| **Total Samples** | 13,250,000 paired image-text instances |
-| **Languages Covered** | 23 (22 Eighth Schedule Constitutional Languages of India + Bhojpuri) |
-| **Writing Systems** | 12 distinct scripts (including bidirectional LTR Brahmic and RTL Extended Arabic) |
-| **Packaging Format** | 2,650 standardized WebDataset POSIX `.tar` archives |
-| **Shard Capacity** | ~5,000 paired samples per archive |
-| **Image Encoding** | Lossless WebP (`.webp`) |
-| **Annotation Format** | UTF-8 JSON (`.json`) with token-level bounding coordinates |
-| **Primary Task** | Multilingual OCR / Document Image-to-Text / Layout Segmentation |
-| **Dataset Type** | Synthetic Document AI Benchmark |
-| **License** | Apache-2.0 (see [Licensing and Upstream Provenance](#16-licensing)) |
-| **Access Policy** | Gated on Hugging Face Hub (requires user agreement) |
+| **Total Scale** | 28,500,000 paired image-text instances |
+| **Archive Topology** | 5,700 WebDataset POSIX `.tar` archives (exactly 5,000 paired samples per shard) |
+| **Language Coverage** | 71 South Asian languages (22 Eighth Schedule languages + 49 regional, tribal & classical languages) |
+| **Writing Systems** | 18 distinct writing systems |
+| **Active Verified Fonts** | 134 verified open-source OpenType / TrueType fonts (1 additional font quarantined) |
+| **Structural Granularity** | 4 tiers: Full Page (2%), Paragraph (13%), Reading Line (55%), Word/Token (30%) |
+| **Image Format** | WebP lossy encoding at `quality=85` (`.webp`) |
+| **Annotation Format** | UTF-8 JSON (`.json`) with token-level logical bounding boxes `[x0, y0, x1, y1]` |
+| **Degradation Distribution** | 12.5% Clean Baseline Controls (`global_idx % 8 == 0`) / 87.5% Stochastic Degradation |
+| **Degradation System** | 54-operator reference library; cloud production runner executes a controlled 12-substrate + 7-transform subset |
+| **Shard File Naming** | 100% published as `{lang}_train_{shard:05d}.tar` (no separate physical `_val_` or `_test_` files) |
+| **Partition Recipe** | Deterministic shard-index slicing recommended (e.g., ~90% train, ~5% val, ~5% test) |
+| **Reproducibility** | Pseudo-deterministic (seeded PRNG; preserves statistical structure across reruns) |
+| **Primary Tasks** | Multilingual OCR, Document Layout Research, Token Localization Research, Controlled Robustness Evaluation |
+| **Licensing** | Software & metadata: Apache-2.0; Fonts: SIL OFL 1.1 / GPL+FE / Apache-2.0; Upstream text: multi-license |
 
 ---
 
-## 2. Motivation
+## 3. Why BhartiOCR Exists
 
-Optical Character Recognition (OCR) and Vision-Language Models (VLMs) applied to Indian languages frequently fail on real-world printed material. BhartiOCR addresses three recurring challenges in synthetic document generation:
+Optical Character Recognition and Document Understanding models trained on Latin-script corpora or clean synthetic renders frequently fail when deployed on South Asian printed material. BhartiOCR targets three specific engineering bottlenecks:
 
-### 2.1 Diacritic and Vertical Layout Truncation
-Indian writing systems feature complex non-linear vertical vowel modifiers (*matras*, *halants*, *anusvaras*, *visargas*, and *nuktas*) situated above, below, or across character stems. Standard rasterization pipelines frequently compute tight horizontal bounding boxes that clip ascender and descender strokes, leading to feature degradation during spatial pooling ($H=1$) in convolutional and Transformer backbones. BhartiOCR integrates dynamic font-metric zone calculations ($H_{\text{ascender}} + H_{\text{body}} + H_{\text{descender}}$) with generous padding to prevent boundary clipping.
+### 3.1 Complex Text Layout (CTL) and Conjunct Integrity
+Brahmic writing systems are alpha-syllabaries (abugidas) where consonants carry an inherent vowel that is modified by dependent vowel signs (*matras*). Consonant clusters combine through halants (viramas) into complex conjunct ligatures (*samyuktaksharas*), half-forms, or vertically stacked glyphs. Perso-Arabic scripts (Urdu, Kashmiri, Sindhi) require cursive, context-sensitive glyph shaping across initial, medial, final, and isolated positions, formatted in Nastaliq or Naskh typographic styles.
 
-### 2.2 Complex Text Layout (CTL) and Ligature Integrity
-Indic scripts require OpenType shaping engines to compute context-dependent glyph substitutions, consonant conjuncts (*samyuktaksharas*), and explicit half-forms. Naive rasterization tools produce disjointed graphemes or unmapped placeholder boxes (`.notdef` Glyph ID 0). BhartiOCR processes all text through HarfBuzz (`uharfbuzz`) with explicit script tags, language specifiers, and bidirectional text direction (`ltr` / `rtl`).
+Standard rasterization tools (such as default PIL rendering) bypass OpenType GSUB/GPOS tables, producing disconnected graphemes, misplaced diacritics, or missing-glyph tofu boxes (`.notdef` Glyph ID 0). BhartiOCR routes all text buffers through `uharfbuzz` with explicit script tags, language specifiers, and bidirectional flags (`ltr` vs `rtl`).
 
-### 2.3 The Synthetic-to-Real Document Domain Gap
-Clean synthetic text renders fail to prepare models for the visual noise, chemical degradation, and mechanical distortions encountered in physical archives, newsprints, court filings, and administrative circulars. BhartiOCR incorporates a 54-operator physical degradation pipeline modeling substrate fibers, ink bleed, photostat thresholding, handling creases, bureaucratic stamps, lighting gradients, and optical sensor noise.
+### 3.2 Diacritic Containment and Vertical Zone Padding
+Indic scripts feature vertical vowel signs, nasal markers (*anusvaras*), breath markers (*visargas*), and nuance dots (*nuktas*) placed above the headline (*shirorekha*) or below the base consonant. Standard bounding-box tight-cropping clips these extremities, leading to systematic character and conjunct substitution errors during visual recognition.
 
----
+The rendering pipeline adds font-metric-derived vertical padding to reduce diacritic and glyph-extremity clipping:
+> **Vertical Padding Metric:** `Height = Ascender Zone + Descender Zone + Safety Padding`
+This padding is designed to reduce clipping across upper and lower extremities.
 
-## 3. Dataset Scale & Train/Validation/Test Splits
+### 3.3 Realistic Non-Sterile Document Degradation
+Standard synthetic datasets present clean black text on uniform white backgrounds. Real-world South Asian documents (newspapers, archival books, court filings, administrative circulars) exhibit thin newsprint pulp bleed, toner micro-voids, ink feathering, handling folds, bureaucratic rubber stamps, uneven illumination shadows, and camera perspective tilt.
 
-The dataset comprises 13,250,000 instances organized into a standardized 90 / 5 / 5 partition scheme:
-
-| Split | Percentage | Total Samples | Total Shards | Intended Use |
-|---|:---:|---:|---:|---|
-| **Train** | 90.0% | 11,925,000 | 2,385 | OCR pretraining, fine-tuning, and document layout modeling |
-| **Validation** | 5.0% | 662,500 | 132 | Hyperparameter tuning and checkpoint selection |
-| **Test** | 5.0% | 662,500 | 133 | Zero-shot and fine-tuned benchmark evaluation |
-| **Total** | **100.0%** | **13,250,000** | **2,650** | Complete v1.0 release |
+BhartiOCR applies a multi-stage degradation pipeline combining procedural paper substrates, ink compositing, and physical/optical noise to narrow the domain gap between synthetic pretraining and physical document recognition.
 
 ---
 
-## 4. Language and Writing-System Coverage
+## 4. Generation Pipeline
 
-The v1.0 release encompasses all 22 official Eighth Schedule languages of India plus Bhojpuri:
+```
+[Raw Upstream Text Corpora]
+          │
+          ▼
+[Stage 1: Unicode NFC Normalization] ──> Preserves ZWJ (\u200D) & ZWNJ (\u200C)
+          │
+          ▼
+[Stage 2: Linguistic Purity Gate] ────> Stopword exclusion & >=3 native script chars
+          │
+          ▼
+[Stage 3: Font Selection & cmap Gate] ─> Rejects font-string pairs missing codepoints
+          │
+          ▼
+[Stage 4: HarfBuzz OpenType Shaping] ──> Script-tagged CTL, GSUB/GPOS, LTR/RTL
+          │
+          ▼
+[Stage 5: FreeType Glyph Raster] ─────> Glyph bitmap rasterization & metric vertical padding
+          │
+          ▼
+[Stage 6: Structural Tier Packaging] ──> 4 Tiers: Full Page, Paragraph, Line, Word
+          │
+          ▼
+[Stage 7: Production Degradation] ────> 12 Substrates + Ink Bleed + 2–4 Stochastic Transforms
+          │
+          ▼
+[Stage 8: Integrity Assertions] ───────> assert token_count > 0, assert glyph_id != 0
+          │
+          ▼
+[Stage 9: Serialization] ─────────────> WebP (quality=85) + UTF-8 JSON
+          │
+          ▼
+[Stage 10: POSIX Tar Packaging] ──────> 5,000 paired samples per shard
+          │
+          ▼
+[Stage 11: SHA-256 Checksum] ─────────> Shard integrity verification
+          │
+          ▼
+[Stage 12: Stream-and-Evict Hub Push] -> Background upload; stream-and-evict shard lifecycle
+```
 
-| Language | Script | ISO 639-3 | Script Code |
-|---|---|:---:|:---:|
-| **Hindi** | Devanagari | `hin` | `Deva` |
-| **Urdu** | Extended Arabic | `urd` | `Arab` |
-| **Bengali** | Bengali | `ben` | `Beng` |
-| **Tamil** | Tamil | `tam` | `Taml` |
-| **Marathi** | Devanagari | `mar` | `Deva` |
-| **Telugu** | Telugu | `tel` | `Telu` |
-| **Gujarati** | Gujarati | `guj` | `Gujr` |
-| **Kannada** | Kannada | `kan` | `Knda` |
-| **Malayalam** | Malayalam | `mal` | `Mlym` |
-| **Odia** | Odia | `ori` | `Orya` |
-| **Punjabi** | Gurmukhi | `pan` | `Guru` |
-| **Assamese** | Bengali-Assamese | `asm` | `Beng` |
-| **Nepali** | Devanagari | `nep` | `Deva` |
-| **Sanskrit** | Devanagari | `san` | `Deva` |
-| **Santali** | Ol Chiki | `sat` | `Olck` |
-| **Manipuri** | Meetei Mayek | `mni` | `Mtei` |
-| **Sindhi** | Extended Arabic | `snd` | `Arab` |
-| **Bodo** | Devanagari | `brx` | `Deva` |
-| **Bhojpuri** | Devanagari | `bho` | `Deva` |
-| **Kashmiri** | Extended Arabic | `kas` | `Arab` |
-| **Konkani** | Devanagari | `gom` | `Deva` |
-| **Maithili** | Devanagari | `mai` | `Deva` |
-| **Dogri** | Devanagari | `doi` | `Deva` |
-| **Total** | **12 Writing Systems** | **23** | |
+<div align="center">
+<img src="assets/figure2_generation_pipeline.png" alt="Figure 2: Actual Generation Pipeline" width="100%">
+<p><em>Figure 2: Actual production synthesis pipeline from normalized Unicode buffers to verified WebDataset shards.</em></p>
+</div>
 
 ---
 
-## 5. Structural Granularity
+## 5. Language & Writing-System Coverage
 
-To support tasks ranging from word recognition to complete document layout parsing, samples are stratified into four structural tiers:
+BhartiOCR encompasses **71 South Asian languages** (22 Eighth Schedule languages + 49 regional, tribal & classical languages) spanning **18 distinct writing systems**:
 
-| Tier | Granularity | Volume Share | Samples | Typ. Resolution ($W \times H$) | Words / Instance | Primary Evaluation Focus |
+### 5.1 Full 71-Language Master Inventory
+
+| # | Language | ISO 639-3 | Script Family | Direction | Shards Live | Samples Live | Hub Directory |
+| :-: | :--- | :---: | :--- | :---: | :---: | :---: | :--- |
+| 1 | **Bengali** | `ben` | Bengali-Assamese (`Beng`) | LTR | 200 | 1,000,000 | `data/bengali/` |
+| 2 | **Hindi** | `hin` | Devanagari (`Deva`) | LTR | 200 | 1,000,000 | `data/hindi/` |
+| 3 | **Marathi** | `mar` | Devanagari (`Deva`) | LTR | 200 | 1,000,000 | `data/marathi/` |
+| 4 | **Tamil** | `tam` | Tamil (`Taml`) | LTR | 200 | 1,000,000 | `data/tamil/` |
+| 5 | **Urdu** | `urd` | Extended Arabic (`Arab`) | RTL | 200 | 1,000,000 | `data/urdu/` |
+| 6 | **Angika** | `anp` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/angika/` |
+| 7 | **Assamese** | `asm` | Bengali-Assamese (`Beng`) | LTR | 100 | 500,000 | `data/assamese/` |
+| 8 | **Awadhi** | `awa` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/awadhi/` |
+| 9 | **Bhojpuri** | `bho` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/bhojpuri/` |
+| 10 | **Bishnupriya Manipuri** | `bpy` | Bengali-Assamese (`Beng`) | LTR | 100 | 500,000 | `data/bishnupriya/` |
+| 11 | **Bodo** | `brx` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/bodo/` |
+| 12 | **Braj Bhasha** | `bra` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/brajbhasha/` |
+| 13 | **Gondi** | `gon` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/gondi/` |
+| 14 | **Gujarati** | `guj` | Gujarati (`Gujr`) | LTR | 100 | 500,000 | `data/gujarati/` |
+| 15 | **Haryanvi** | `bgc` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/haryanvi/` |
+| 16 | **Kannada** | `kan` | Kannada (`Knda`) | LTR | 100 | 500,000 | `data/kannada/` |
+| 17 | **Kashmiri** | `kas` | Extended Arabic (`Arab`) | RTL | 100 | 500,000 | `data/kashmiri/` |
+| 18 | **Malayalam** | `mal` | Malayalam (`Mlym`) | LTR | 100 | 500,000 | `data/malayalam/` |
+| 19 | **Manipuri** | `mni` | Meetei Mayek (`Mtei`) | LTR | 100 | 500,000 | `data/manipuri/` |
+| 20 | **Marwari** | `mwr` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/marwari/` |
+| 21 | **Nepali** | `nep` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/nepali/` |
+| 22 | **Newari (Nepal Bhasa)** | `new` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/newari/` |
+| 23 | **Odia** | `ori` | Odia (`Orya`) | LTR | 100 | 500,000 | `data/odia/` |
+| 24 | **Pahari-Pothwari** | `phr` | Extended Arabic (`Arab`) | RTL | 100 | 500,000 | `data/pahari/` |
+| 25 | **Punjabi** | `pan` | Gurmukhi (`Guru`) | LTR | 100 | 500,000 | `data/punjabi/` |
+| 26 | **Rajasthani** | `raj` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/rajasthani/` |
+| 27 | **Sanskrit** | `san` | Devanagari (`Deva`) | LTR | 100 | 500,000 | `data/sanskrit/` |
+| 28 | **Santali** | `sat` | Ol Chiki (`Olck`) | LTR | 100 | 500,000 | `data/santali/` |
+| 29 | **Saraiki** | `skr` | Extended Arabic (`Arab`) | RTL | 100 | 500,000 | `data/saraiki/` |
+| 30 | **Sindhi** | `snd` | Extended Arabic (`Arab`) | RTL | 100 | 500,000 | `data/sindhi/` |
+| 31 | **Sinhala** | `sin` | Sinhala (`Sinh`) | LTR | 100 | 500,000 | `data/sinhala/` |
+| 32 | **Telugu** | `tel` | Telugu (`Telu`) | LTR | 100 | 500,000 | `data/telugu/` |
+| 33 | **Tulu** | `tcy` | Kannada (`Knda`) | LTR | 100 | 500,000 | `data/tulu/` |
+| 34 | **Angami Naga** | `njm` | Latin (`Latn`) | LTR | 50 | 250,000 | `data/angami_naga/` |
+| 35 | **Ao Naga** | `njo` | Latin (`Latn`) | LTR | 50 | 250,000 | `data/ao_naga/` |
+| 36 | **Badaga** | `bfq` | Tamil (`Taml`) | LTR | 50 | 250,000 | `data/badaga/` |
+| 37 | **Bagheli** | `bfy` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/bagheli/` |
+| 38 | **Balti** | `bft` | Extended Arabic (`Arab`) | RTL | 50 | 250,000 | `data/balti/` |
+| 39 | **Bhili** | `bhb` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/bhili/` |
+| 40 | **Bundeli** | `bns` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/bundeli/` |
+| 41 | **Chakma** | `ccp` | Chakma (`Cakm`) | LTR | 50 | 250,000 | `data/chakma/` |
+| 42 | **Chhattisgarhi** | `hne` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/chhattisgarhi/` |
+| 43 | **Dogri** | `doi` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/dogri/` |
+| 44 | **Doteli** | `dty` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/doteli/` |
+| 45 | **Garhwali** | `gbm` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/garhwali/` |
+| 46 | **Garo** | `grt` | Latin (`Latn`) | LTR | 50 | 250,000 | `data/garo/` |
+| 47 | **Gojri** | `gju` | Extended Arabic (`Arab`) | RTL | 50 | 250,000 | `data/gojri/` |
+| 48 | **Ho** | `hoc` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/ho/` |
+| 49 | **Karbi** | `mjw` | Latin (`Latn`) | LTR | 50 | 250,000 | `data/karbi/` |
+| 50 | **Kharia** | `khr` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/kharia/` |
+| 51 | **Khasi** | `kha` | Latin (`Latn`) | LTR | 50 | 250,000 | `data/khasi/` |
+| 52 | **Kodava** | `kfa` | Kannada (`Knda`) | LTR | 50 | 250,000 | `data/kodava/` |
+| 53 | **Kokborok** | `trp` | Bengali-Assamese (`Beng`) | LTR | 50 | 250,000 | `data/kokborok/` |
+| 54 | **Konkani** | `gom` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/konkani/` |
+| 55 | **Konyak Naga** | `nbe` | Latin (`Latn`) | LTR | 50 | 250,000 | `data/konyak_naga/` |
+| 56 | **Kui** | `kxu` | Odia (`Orya`) | LTR | 50 | 250,000 | `data/kui/` |
+| 57 | **Kumaoni** | `kfy` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/kumaoni/` |
+| 58 | **Kurukh (Oraon)** | `kru` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/kurukh/` |
+| 59 | **Lepcha** | `lep` | Lepcha (`Lepc`) | LTR | 50 | 250,000 | `data/lepcha/` |
+| 60 | **Limbu** | `lif` | Sirijanga (Limbu) (`Limb`) | LTR | 50 | 250,000 | `data/limbu/` |
+| 61 | **Lotha Naga** | `njh` | Latin (`Latn`) | LTR | 50 | 250,000 | `data/lotha_naga/` |
+| 62 | **Magahi** | `mag` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/magahi/` |
+| 63 | **Maithili** | `mai` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/maithili/` |
+| 64 | **Malvi** | `mup` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/malvi/` |
+| 65 | **Mizo** | `lus` | Latin (`Latn`) | LTR | 50 | 250,000 | `data/mizo/` |
+| 66 | **Mundari** | `unr` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/mundari/` |
+| 67 | **Pali** | `pli` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/pali/` |
+| 68 | **Prakrit** | `pra` | Devanagari (`Deva`) | LTR | 50 | 250,000 | `data/prakrit/` |
+| 69 | **Shina** | `scl` | Extended Arabic (`Arab`) | RTL | 50 | 250,000 | `data/shina/` |
+| 70 | **Tibetan** | `bod` | Tibetan (`Tibt`) | LTR | 50 | 250,000 | `data/tibetan/` |
+| 71 | **Western Punjabi (Shahmukhi)** | `pnb` | Extended Arabic (`Arab`) | RTL | 50 | 250,000 | `data/western_punjabi/` |
+| **Total** | **71 Languages** | | **18 Writing Systems** | | **5,700** | **28,500,000** | |
+
+### 5.2 Authoritative Writing System Aggregation
+
+| Writing System | Script Code | Direction | Associated Languages | Shards | Total Samples |
+| :--- | :---: | :---: | :--- | :---: | :---: |
+| **Devanagari** | `Deva` | LTR | Angika, Awadhi, Bagheli, Bhili, Bhojpuri, Bodo, Braj Bhasha, Bundeli, Chhattisgarhi, Dogri, Doteli, Garhwali, Gondi, Haryanvi, Hindi, Ho, Kharia, Konkani, Kumaoni, Kurukh (Oraon), Magahi, Maithili, Malvi, Marathi, Marwari, Mundari, Nepali, Newari (Nepal Bhasa), Pali, Prakrit, Rajasthani, Sanskrit (32 languages) | 2,500 | 12,500,000 |
+| **Extended Arabic** | `Arab` | RTL | Balti, Gojri, Kashmiri, Pahari-Pothwari, Saraiki, Shina, Sindhi, Urdu, Western Punjabi (Shahmukhi) (9 languages) | 800 | 4,000,000 |
+| **Bengali-Assamese** | `Beng` | LTR | Assamese, Bengali, Bishnupriya Manipuri, Kokborok (4 languages) | 450 | 2,250,000 |
+| **Latin** | `Latn` | LTR | Angami Naga, Ao Naga, Garo, Karbi, Khasi, Konyak Naga, Lotha Naga, Mizo (8 languages) | 400 | 2,000,000 |
+| **Tamil** | `Taml` | LTR | Badaga, Tamil (2 languages) | 250 | 1,250,000 |
+| **Kannada** | `Knda` | LTR | Kannada, Kodava, Tulu (3 languages) | 250 | 1,250,000 |
+| **Odia** | `Orya` | LTR | Kui, Odia (2 languages) | 150 | 750,000 |
+| **Gujarati** | `Gujr` | LTR | Gujarati (1 language) | 100 | 500,000 |
+| **Malayalam** | `Mlym` | LTR | Malayalam (1 language) | 100 | 500,000 |
+| **Meetei Mayek** | `Mtei` | LTR | Manipuri (1 language) | 100 | 500,000 |
+| **Gurmukhi** | `Guru` | LTR | Punjabi (1 language) | 100 | 500,000 |
+| **Ol Chiki** | `Olck` | LTR | Santali (1 language) | 100 | 500,000 |
+| **Sinhala** | `Sinh` | LTR | Sinhala (1 language) | 100 | 500,000 |
+| **Telugu** | `Telu` | LTR | Telugu (1 language) | 100 | 500,000 |
+| **Chakma** | `Cakm` | LTR | Chakma (1 language) | 50 | 250,000 |
+| **Lepcha** | `Lepc` | LTR | Lepcha (1 language) | 50 | 250,000 |
+| **Sirijanga (Limbu)** | `Limb` | LTR | Limbu (1 language) | 50 | 250,000 |
+| **Tibetan** | `Tibt` | LTR | Tibetan (1 language) | 50 | 250,000 |
+| **Total** | | | **18 Writing Systems (71 Languages)** | **5,700** | **28,500,000** |
+
+---
+
+## 6. Four Structural Tiers
+
+Every 5,000-sample WebDataset shard is composed across four document structural tiers to support diverse OCR and document-AI modeling tasks:
+
+| Tier | Granularity | Volume Share | Total Samples Live | Typical Canvas Dimensions | Word Count | Target Modeling Focus |
 |---|---|:---:|---:|:---:|:---:|---|
-| **Tier 1** | Full-page documents | 2.0% | 265,000 | $1200 \times 1600$ | 80–350 | Multi-column reading order, document layout analysis (DLA) |
-| **Tier 2** | Paragraph blocks | 13.0% | 1,722,500 | $800 \times 400$ | 25–80 | Multi-line text block recognition, paragraph-level transcription |
-| **Tier 3** | Reading lines | 55.0% | 7,287,500 | $640 \times 72$ | 4–18 | Sequence-to-sequence line recognition (TrOCR, CRNN) |
-| **Tier 4** | Tokens & conjuncts | 30.0% | 3,975,000 | $220 \times 54$ | 1–3 | Vocabulary coverage, ligature classification, rare conjunct evaluation |
-| **Total** | | **100.0%** | **13,250,000** | | | |
+| **Tier 1** | Full-Page Documents | 2.0% | 570,000 | 1000 x 1350 px | 80-350 | Multi-column reading order, document layout research, table/spread parsing |
+| **Tier 2** | Paragraph Blocks | 13.0% | 3,705,000 | Max width 700 px (variable height) | 25-80 | Multi-line text block recognition, wrapped paragraph reading order |
+| **Tier 3** | Reading Lines | 55.0% | 15,675,000 | Variable width x dynamic metric height | 4-18 | Sequence-to-sequence line recognition (TrOCR, CRNN), CTC loss |
+| **Tier 4** | Words / Tokens | 30.0% | 8,550,000 | Word advance width x dynamic metric height | 1-3 | Word/token recognition, vocabulary coverage, and complex-conjunct examples |
+| **Total** | | **100.0%** | **28,500,000** | | | |
 
-* **Tier 1 (Full-page documents):** Multi-column synthetic compositions simulating newspapers, government gazettes, and book pages with token-level bounding boxes and reading order metadata.
-* **Tier 2 (Paragraph blocks):** Justified multi-line formatted text blocks with uniform leading and inter-paragraph margins.
-* **Tier 3 (Reading lines):** Continuous syntactic lines, poetic verses, newspaper headlines, and conversational dialogue.
-* **Tier 4 (Tokens and conjuncts):** Isolated vocabulary words, numbers, currency symbols, and complex consonant conjuncts.
+<div align="center">
+<img src="assets/figure1_corpus_architecture.png" alt="Figure 1: Corpus Architecture" width="100%">
+<p><em>Figure 1: Corpus architecture across four structural tiers, 71 languages, and 18 writing systems.</em></p>
+</div>
 
----
-
-## 6. Script Distribution & Typographic Assets
-
-The 13.25M corpus spans 12 writing systems shaped with over 140 open-source OpenType fonts:
-
-| Script Family | ISO Code | Languages Represented | Total Samples | Sample Fonts Used |
-|---|:---:|---|---:|---|
-| **Devanagari** | `Deva` | Hindi, Marathi, Nepali, Sanskrit, Bodo, Bhojpuri, Konkani, Maithili, Dogri | 5,250,000 | Noto Sans Devanagari, Sahitya, Halant, Kalam, Asar, Gotu, Rajdhani, Yatra One |
-| **Extended Arabic (RTL)** | `Arab` | Urdu, Sindhi, Kashmiri | 2,000,000 | Noto Nastaliq Urdu, Noto Sans Arabic, Gulzar, Lateef, Scheherazade New |
-| **Bengali-Assamese** | `Beng` | Bengali, Assamese | 1,500,000 | Noto Sans Bengali, Galada, Mina, Atma, Hind Siliguri, Tiro Bangla |
-| **Tamil** | `Taml` | Tamil | 1,000,000 | Noto Sans Tamil, Arima Madurai, Catamaran, Mukta Malar, Pavanam |
-| **Telugu** | `Telu` | Telugu | 500,000 | Noto Sans Telugu, Dhurjati, Mandali, Ramabhadra, Suranna, Tenali Ramakrishna |
-| **Kannada** | `Knda` | Kannada | 500,000 | Noto Sans Kannada, Baloo Tamma 2, Hubballi, Naganandini, Tiro Kannada |
-| **Malayalam** | `Mlym` | Malayalam | 500,000 | Noto Sans Malayalam, Chilanka, Gayathri, Manjari, Meera, Ranga |
-| **Gujarati** | `Gujr` | Gujarati | 500,000 | Noto Sans Gujarati, Farsan, Mogra, Rasa, Shrikhand, Mukta Vaani |
-| **Odia** | `Orya` | Odia | 500,000 | Noto Sans Odia, Baloo Bhaina 2, Kalinga, Soumyashree, Odia OT |
-| **Gurmukhi** | `Guru` | Punjabi | 500,000 | Noto Sans Gurmukhi, Baloo Paaji 2, Mukta Mahee, Saab, Raavi |
-| **Ol Chiki** | `Olck` | Santali | 500,000 | Noto Sans Ol Chiki, Guru Gomke, Ol Chiki Classic |
-| **Meetei Mayek** | `Mtei` | Manipuri | 500,000 | Noto Sans Meetei Mayek, Eeyek, Meetei Mayek Unicode |
+* **Tier 1 (Full-Page Spreads):** Rendered on fixed 1000 × 1350 px canvases simulating archival documents, government gazettes, and daily broadsheets with headers, horizontal column rules, and multi-block paragraphs.
+* **Tier 2 (Paragraph Blocks):** Formatted text blocks wrapped to a maximum width of 700 pixels with uniform line leading and font sizes (20–28 pt).
+* **Tier 3 (Reading Lines):** Continuous syntactic lines, poetry verses, and headlines with font sizes ranging from 26 to 38 pt.
+* **Tier 4 (Words and Isolated Tokens):** Isolated lexical items, compound words, numerals, and complex conjuncts (32–44 pt). Annotations provide word/token-level boundary coordinates.
 
 ---
 
-## 7. Rendering and Typography Validation Pipeline
+## 7. Rendering & Complex Text Layout
 
-Text synthesis uses a script-aware rendering architecture designed to enforce strict typographic and Unicode standards:
+Text rendering is implemented in Python via `uharfbuzz` and `freetype-py`:
 
-```
-[Raw Text Corpus]
-       │
-       ▼
-[Unicode NFC Normalization & ZWJ/ZWNJ Preservation]
-       │
-       ▼
-[Corpus Contamination Gate: Foreign Stopword Scrubbing]
-       │
-       ▼
-[Font cmap Validation via fontTools.ttLib.TTFont]
-       │
-       ▼
-[HarfBuzz OpenType CTL Shaping (Script/Direction Tagged)]
-       │
-       ▼
-[FreeType Subpixel Rasterization with Dynamic Zone Padding]
-       │
-       ▼
-[Post-Render Verification: 0 .notdef Glyphs, 0 Canvas Clipping]
-```
-
-### 7.1 OpenType CTL Shaping
-Text buffers are normalized to Unicode NFC while strictly preserving Zero-Width Joiner (`\u200D`) and Zero-Width Non-Joiner (`\u200C`) sequences. Text is shaped using `uharfbuzz` with explicit script tags (`Deva`, `Beng`, `Taml`, `Arab`, `Mtei`, `Olck`, etc.) and directionality (`ltr` for Brahmic scripts, `rtl` for Extended Arabic).
-
-### 7.2 Font Character-Map Validation
-Before shaping, candidate fonts are analyzed with `fontTools.ttLib.TTFont` to extract their Unicode `cmap` table. If any character in a target string lacks a glyph mapping, the string-font pair is rejected. This prevents missing-glyph placeholders (`.notdef` / Glyph ID 0) from entering the generated dataset.
-
-### 7.3 Dynamic Vertical Metric Containment
-Vertical bounding canvas dimensions are calculated per font:
-$$\text{Height} = \text{Ascender Zone} + \text{Body Zone} + \text{Descender Zone} + \text{Safety Padding}$$
-This ensures all upper and lower diacritical markers remain strictly contained within the rasterized canvas.
+1. **Unicode NFC & Joiner Retention**: Ingested text is normalized to Unicode NFC via `unicodedata.normalize('NFC', text)`. Zero-Width Joiner (`\u200D` / ZWJ) and Zero-Width Non-Joiner (`\u200C` / ZWNJ) codepoints are strictly preserved to maintain authentic half-consonant forms (e.g., Hindi *हल्*) and ligature suppression.
+2. **HarfBuzz Buffer Configuration**: For each text line, an empty `uharfbuzz.Buffer` is initialized, assigned the target ISO 15924 script tag (`Deva`, `Beng`, `Taml`, `Arab`, `Mtei`, `Olck`, etc.), ISO 639-3 language specifier, and directional mode (`ltr` for Brahmic scripts; `rtl` for Extended Arabic).
+3. **OpenType Feature Shaping**: `uharfbuzz.shape(hb_font, hb_buffer)` executes OpenType `GSUB` (glyph substitution) and `GPOS` (glyph positioning) rules, producing output glyph IDs, cluster associations, advance widths (`x_advance`), and positional offsets (`x_offset`, `y_offset`).
+4. **FreeType Glyph Rasterization**: Glyph IDs are loaded via `freetype.Face.load_glyph(gid, FT_LOAD_RENDER | FT_LOAD_NO_HINTING)` to rasterize 8-bit anti-aliased alpha bitmaps. Bitmaps are blitted onto a grayscale NumPy canvas using cumulative cursor positions.
+5. **Bidirectional Cursor Tracking**: For LTR scripts, the horizontal pen cursor advances by `x_advance // 64`. For RTL scripts (`urd`, `kas`, `snd`), the cursor begins at `canvas_width - padding` and decrements by `x_advance // 64`.
+6. **Canvas Compositing**: Pillow (`PIL.Image`) wraps the rendered NumPy array for subsequent paper-physics blending and format serialization.
 
 ---
 
-## 8. Master 54-Operator Physical Degradation Pipeline
+## 8. Font Validation & Typography
 
-BhartiOCR incorporates a 4-layer probabilistic physical degradation DAG with **54 documented operators**:
-* **12.5% Clean Controls:** Undegraded digital baseline scans.
-* **87.5% Compound Degraded Samples:** Transformed through a stochastic sequence of 2 to 5 physical operators.
+The repository contains **134 active, verified OpenType and TrueType fonts** organized across language and script directories:
 
-| Layer | Operator Category | Count | Documented Operators | Probability |
-|---|---|:---:|---|:---:|
-| **Layer 1** | **Substrates & Paper Types** | 10 | Newsprint pulp, Recycled Kraft, Cream book paper, Ruled notebook paper, Aged acid parchment, Heavy handmade paper, Glazed magazine sheet, Thermal fax paper, Stained ledger paper, Office copy 80gsm | 100% (Base) |
-| **Layer 2** | **Printing & Ink Chemistry** | 12 | Capillary ink bleed, Toner micro-voids, Faded typewriter ribbon, Ballpoint pen navy, Carbon black saturation, Dot-matrix pin streaks, Ink feathering, Letterpress halo effect, Thermal drift, Stamp ink bleed, Roller smudge, Under-inking voids | 45%–70% |
-| **Layer 3** | **Physical Wear & Handling Defects** | 16 | Paper creases, Bureaucratic circular stamps, Chai/water stains, Moisture droplet blooms, Dog-eared folded corners, Photostat threshold speckles, Staple rust marks, Pin holes, Edge tears, Handling grime, Dust specks, Mildew spots, Crease shadow lines, Surface abrasions, Binding glue stains, Fingerprint smudges | 30%–60% |
-| **Layer 4** | **Optical & Sensor Distortions** | 16 | Gaussian defocus blur, Ambient lighting gradient shadow, Sensor chroma noise, Micro-keystone perspective tilt, Barrel optical distortion, Radial vignetting, Flash glare reflection, Motion smear, Under-exposure drop, Over-exposure bloom, JPEG compression blocking, Resolution downsampling, Color temperature shift, Bilinear jitter, Skew angle rotation, Scanner line dropout | 35%–55% |
-
-Each generated sample logs the exact sequence of applied operators in its JSON annotation.
+* **Font Verification Gate**: Before rendering, every font undergoes character-map validation via `fontTools.ttLib.TTFont`. The active Unicode `cmap` table is extracted via `font.getBestCmap()`. If a candidate string contains even a single character unmapped in the font's `cmap`, the font-text pair is rejected.
+* **Quarantine Policy**: Fonts that fail minimum script codepoint thresholds (fewer than 20 target script codepoints in `cmap`) or generate invalid metrics are isolated in `fonts/quarantine_broken_fonts/` (1 font currently quarantined).
+* **Script Allocation**: High-resource scripts (Devanagari, Bengali, Tamil, Extended Arabic) utilize diverse font pools spanning classical serif, modern sans-serif, and display typefaces. Scripts with smaller open-source typography ecosystems (Ol Chiki, Meetei Mayek) utilize verified authoritative typefaces (e.g., Noto Sans Ol Chiki, Noto Sans Meetei Mayek).
 
 ---
 
-## 9. Annotation Format & Schema
+## 9. Annotation Schema & Geometry
 
-Each sample in a WebDataset `.tar` shard contains a paired image (`.webp`) and metadata record (`.json`).
+Each sample within a WebDataset archive consists of a WebP image (`.webp`) and a paired UTF-8 JSON metadata record (`.json`).
 
-### 9.1 Sample Annotation (Tier 2 Paragraph Block)
+<div align="center">
+<img src="assets/figure4_annotation_geometry.png" alt="Figure 4: Annotation Geometry & JSON Schema" width="100%">
+<p><em>Figure 4: Token-level geometry specification and paired JSON metadata schema.</em></p>
+</div>
+
+### 9.1 JSON Schema Example (Tier 3 Reading Line)
 
 ```json
 {
-  "sample_key": "kan_0008644",
-  "tier": "Tier_2_Paragraph",
-  "lang": "kan",
-  "script": "Knda",
-  "font_name": "BalooTamma2-Regular.ttf",
+  "sample_key": "nep_0000003",
+  "tier": "Tier_3_Line",
+  "lang": "nep",
+  "font_name": "RozhaOne-Regular.ttf",
   "is_clean": false,
-  "canvas_size": [669, 213],
-  "text": "ಅದನ್ನು ತಂದು ಶ್ರೀನಿವಾಸನಿಗೆ ಕೊಡುತ್ತಾಳೆ. ಅಂಗಡಿಗೆ ಹಿಂದಿರುಗಿ ಬಂದ ಶ್ರೀನಿವಾಸ ಡಬ್ಬಿಯನ್ನು",
+  "canvas_size": [614, 71],
+  "text": "टाढा दक्षिणबाट पल्लवहरूद्वारा पराजित भए जसको फलस्वरूप",
   "tokens": [
     {
-      "text": "ಅದನ್ನು",
-      "bbox": [24, 16, 110, 68]
+      "text": "टाढा",
+      "bbox": [23, 29, 66, 44]
     },
     {
-      "text": "ತಂದು",
-      "bbox": [122, 16, 185, 68]
+      "text": "दक्षिणबाट",
+      "bbox": [69, 22, 167, 46]
     },
     {
-      "text": "ಶ್ರೀನಿವಾಸನಿಗೆ",
-      "bbox": [198, 16, 360, 68]
+      "text": "पल्लवहरूद्वारा",
+      "bbox": [170, 29, 303, 48]
+    },
+    {
+      "text": "पराजित",
+      "bbox": [306, 22, 381, 45]
+    },
+    {
+      "text": "भए",
+      "bbox": [386, 29, 418, 44]
+    },
+    {
+      "text": "जसको",
+      "bbox": [421, 23, 488, 45]
+    },
+    {
+      "text": "फलस्वरूप",
+      "bbox": [491, 29, 590, 45]
     }
   ],
-  "token_count": 22,
+  "token_count": 7,
+  "word_count": 7,
   "applied_augmentations": [
-    "Substrate: notebook_ruled",
-    "PhysicalDefect: paper_crease",
-    "Ink: capillary_bleed",
-    "Sensor: optical_defocus"
+    "#02 Substrate: aged_paper",
+    "#19 Mobile JPEG",
+    "#21 Diagonal Fold",
+    "#40 Keystone Tilt",
+    "#15 Shadow Gradient"
   ]
 }
 ```
 
-### 9.2 Metadata Field Definitions
+### 9.2 Field Definitions
 
 | Field Name | Type | Description |
 |---|:---:|---|
-| `sample_key` | `string` | Globally unique sample identifier formatted as `{lang}_{index:07d}`. |
-| `tier` | `string` | Structural granularity tier (`Tier_1_FullPage`, `Tier_2_Paragraph`, `Tier_3_Line`, `Tier_4_Word`). |
-| `lang` | `string` | ISO 639-3 three-letter language code. |
-| `script` | `string` | ISO 15924 four-letter script code. |
-| `font_name` | `string` | OpenType font family utilized for HarfBuzz shaping. |
-| `is_clean` | `boolean` | Flag indicating whether the sample belongs to the clean control subset (12.5%). |
+| `sample_key` | `string` | Unique identifier formatted as `{lang}_{global_idx:07d}` (e.g., `kan_0008644`). |
+| `tier` | `string` | Structural tier: `Tier_1_FullPage`, `Tier_2_Paragraph`, `Tier_3_Line`, `Tier_4_Word`. |
+| `lang` | `string` | ISO 639-3 three-letter language identifier. |
+| `font_name` | `string` | Base filename of the font file utilized during shaping and rendering. |
+| `is_clean` | `boolean` | Flag indicating whether the instance is an undegraded control sample (12.5%). |
 | `canvas_size` | `[int, int]` | Canvas dimensions `[width, height]` in pixels. |
-| `text` | `string` | Unicode NFC ground truth text transcription. |
-| `tokens` | `list[dict]` | Token-level annotations with tight ink bounding boxes `[x0, y0, x1, y1]`. |
-| `token_count` | `int` | Total count of annotated tokens in the instance. |
-| `applied_augmentations` | `list[string]` | Sequence of physical operators applied from the degradation pipeline. |
+| `text` | `string` | Ground truth text transcription in normalized Unicode NFC. |
+| `tokens` | `list[dict]` | Token-level annotations containing token `text` and bounding coordinates `bbox`. |
+| `token_count` | `int` | Total number of annotated tokens in the instance. |
+| `word_count` | `int` | Count of whitespace-delimited words in the input text buffer. |
+| `applied_augmentations` | `list[string]` | Ordered list of physical degradation operations applied to the instance. |
+| `shaped_glyphs` | `list[dict]` | Optional debug trace of shaped OpenType glyph IDs and cluster indices (first 30 glyphs). |
 
-Bounding box coordinates use `[x0, y0, x1, y1]` in absolute pixel coordinates where `(x0, y0)` represents the top-left and `(x1, y1)` represents the bottom-right corner.
+### 9.3 Bounding Box Semantics
+
+* **Format**: Bounding boxes are formatted as `[x0, y0, x1, y1]` in absolute integer pixel coordinates with origin `(0, 0)` at the top-left corner.
+* **Semantic Definition**: Bounding boxes represent **logical token boundary zones derived from text advance widths and vertical font metrics**, computed as:
+  ```text
+x0 = cursor position,  x1 = cursor position + token advance width
+y0 = baseline - ascender height + 4,  y1 = baseline + descender depth - 4
+```
+* **Important Caveat**: Bounding boxes represent logical word/token layout cells based on HarfBuzz advance metrics. They are **not** tight pixel-level connected-component ink contours, nor are they character-level or conjunct-level bounding boxes.
 
 ---
 
-## 10. Data Organization & Shard Topology
+## 10. Degradation System
 
-Shards are distributed in language-specific directory trees:
+BhartiOCR maintains a distinction between its **comprehensive reference library** and its **active cloud production runner configuration**:
 
-```
-data/
-├── hindi/      # hin_train_{00000..00199}.tar (200 shards, 1.0M samples)
-├── urdu/       # urd_train_{00000..00199}.tar (200 shards, 1.0M samples)
-├── bengali/    # ben_train_{00000..00199}.tar (200 shards, 1.0M samples)
-├── tamil/      # tam_train_{00000..00199}.tar (200 shards, 1.0M samples)
-├── marathi/    # mar_train_{00000..00199}.tar (200 shards, 1.0M samples)
-├── telugu/     # tel_train_{00000..00099}.tar (100 shards, 500K samples)
-├── gujarati/   # guj_train_{00000..00099}.tar (100 shards, 500K samples)
-├── kannada/    # kan_train_{00000..00099}.tar (100 shards, 500K samples)
-├── malayalam/  # mal_train_{00000..00099}.tar (100 shards, 500K samples)
-├── odia/       # ori_train_{00000..00099}.tar (100 shards, 500K samples)
-├── punjabi/    # pan_train_{00000..00099}.tar (100 shards, 500K samples)
-├── assamese/   # asm_train_{00000..00099}.tar (100 shards, 500K samples)
-├── nepali/     # nep_train_{00000..00099}.tar (100 shards, 500K samples)
-├── sanskrit/   # san_train_{00000..00099}.tar (100 shards, 500K samples)
-├── santali/    # sat_train_{00000..00099}.tar (100 shards, 500K samples)
-├── manipuri/   # mni_train_{00000..00099}.tar (100 shards, 500K samples)
-├── sindhi/     # snd_train_{00000..00099}.tar (100 shards, 500K samples)
-├── bodo/       # brx_train_{00000..00099}.tar (100 shards, 500K samples)
-├── bhojpuri/   # bho_train_{00000..00099}.tar (100 shards, 500K samples)
-├── kashmiri/   # kas_train_{00000..00099}.tar (100 shards, 500K samples)
-├── konkani/    # gom_train_{00000..00049}.tar (50 shards,  250K samples)
-├── maithili/   # mai_train_{00000..00049}.tar (50 shards,  250K samples)
-└── dogri/      # doi_train_{00000..00049}.tar (50 shards,  250K samples)
-```
+<div align="center">
+<img src="assets/figure3_degradation_system.png" alt="Figure 3: Degradation Architecture" width="100%">
+<p><em>Figure 3: Two-layer degradation architecture: 54-operator reference library vs. active production runner configuration.</em></p>
+</div>
+
+### 10.1 Reference 54-Operator Library
+BhartiOCR documents a comprehensive reference library of 54 procedural degradation operators detailed in [`AUGMENTATION_REGISTRY.md`](AUGMENTATION_REGISTRY.md), categorized into five functional domains:
+* **Category A: Procedural Substrates (12 operators)**: Simulates diverse paper stocks, age-induced acid toning, pulp grain, moisture stains, notebook rulings, and formal stationery.
+* **Category B: Physical Degradation Operators (14 operators)**: Models mechanical handling wear, ink capillary bleeding, toner erosion, photostat clipping, folds, carbon dye, and bureaucratic stamps.
+* **Category C: Historical Manuscript Decay (11 operators)**: Captures archival aging phenomena including wormholes, craquelure, iron gall acid corrosion, fungal foxing, and margin embrittlement.
+* **Category D: Geometric, Optical & Sensor Distortions (11 operators)**: Replicates capture artifacts including perspective tilt, optical defocus, sensor noise, dynamic range extremes, and compression loss.
+* **Category E: Handwriting Kinematic Deformations (6 operators)**: Implements synthetic handwriting dynamics, stroke pressure modulation, slant, and elastic deformation models.
+
+*For full mathematical specifications, implementation parameters, and visual examples of all 54 operators, see [`AUGMENTATION_REGISTRY.md`](AUGMENTATION_REGISTRY.md).*
+
+### 10.2 Active Production Runner Configuration
+To sustain cloud throughput on CPU workers while preventing unreadable text corruption, the high-throughput production runner (`indicpixel_kaggle_production_pipeline.py`) executed a controlled subset of this library:
+* **Procedural Substrates**: 1 of 12 procedural paper substrates selected uniformly at random (`clean_white`, `aged_paper`, `book_page`, `newspaper`, `ruled_notebook`, `parchment`, `weathered`, `coffee_stained`, `old_book`, `recycled_kraft`, `cream`, `ivory`).
+* **Ink Bleed Composite**: Simulated capillary ink bleed composited directly onto the procedural substrate.
+* **Stochastic Transforms**: 2 to 4 transforms drawn from the active pool:
+  * `#26 Bureaucratic Stamp` (semi-transparent colored seals)
+  * `#15 Non-Uniform Shadow` (linear illumination gradients)
+  * `#20/#21 Paper Crease / Diagonal Fold` (3D fold shadows)
+  * `#47 Dust / Sensor Noise` (Gaussian normal noise)
+  * `#40 Keystone Tilt` (affine rotation within ±1.0°)
+  * `#44/#45 High / Low Contrast` (dynamic range scaling)
+  * `#19 Mobile JPEG Compression` (quality factor 68–85)
+
+### 10.3 Clean vs Degraded Balance
+* **Clean Baseline Controls**: Exactly **12.5%** of samples (`global_idx % 8 == 0`) are saved as undegraded control samples on white backgrounds (`#01 Clean White Scan Baseline`).
+* **Degraded Samples**: Exactly **87.5%** receive the procedural substrate, ink bleed, and 2 to 4 stochastic transforms.
 
 ---
 
-## 11. Distributed Streaming Quickstart (PyTorch / WebDataset)
+## 11. Quality Assurance
 
-BhartiOCR shards stream directly over HTTP into PyTorch training loops without local disk extraction:
+The synthesis pipeline implements automated validation gates at generation time and periodic forensic audits:
+
+### 11.1 Automated Production Gates
+* **Unicode Normalization Gate**: Text buffers undergo NFC normalization; unmapped control characters and broken surrogate pairs are discarded.
+* **Native Script Character Gate**: Every candidate string must contain at least 3 alphabetical characters within the target script's Unicode block, rejecting punctuation-only noise strings (e.g., `,,,`).
+* **Language-Specific Contamination Filters**: Ingested text is checked against language-specific exclusion lexicons to prevent cross-language stopword leakage (e.g., filtering out Hindi stopwords when synthesizing Bodo or Maithili).
+* **Font `cmap` Assertion**: Reject any candidate text line if even one character is missing from the candidate font's `cmap` table.
+* **`.notdef` Post-Shaping Assertion**: In production, every shaped sample is asserted:
+  ```python
+  assert all(g.get("glyph_id", 1) != 0 for g in glyphs), f"Glyph ID 0 detected in {sample_key}"
+  ```
+  Samples triggering Glyph ID 0 (`.notdef`) are rejected and not serialized. Smoke-test batches audited during production runs reported zero `.notdef` occurrences.
+* **Non-Empty Token Assertion**: Every instance must contain at least one valid token (`assert meta["token_count"] > 0`).
+* **Checksum Verification**: Cloud workers verify local `.tar` shard integrity and calculate SHA-256 digests prior to uploading.
+
+### 11.2 Offline Forensic Auditing Tools
+* **5,000-Sample Cloud Smoke Tests**: Executed in isolated environments prior to deploying full-scale production fleets for newly integrated languages.
+* **Visual Inspection Plates**: Forensic multi-tier broadsheets generated to visually inspect conjunct formation, matra placement, and background substrate realism.
+* **Diacritic Ownership Gate**: An offline reference verification tool used to verify ink pixel containment within token bounding envelopes. (Note: Diacritic ownership verification is run as an offline forensic tool rather than an inline per-sample check inside the cloud production runner).
+
+---
+
+## 12. Preliminary Downstream OCR Evaluation
+
+To evaluate real-world downstream transfer, we fine-tuned identical sequence-to-sequence recognizers (ResNet-BiLSTM-CTC, 200 steps, AdamW lr = 1e-4) across four flagship script cohorts (Hindi, Bengali, Tamil, Urdu) comparing the full BhartiOCR synthetic pipeline against a simple clean synthetic renderer, evaluated on 1,183 unseen held-out scans from the independent **Sarvam Indic OCR Bench** (`sarvamai/indic-ocr-bench`, Apache-2.0).
+
+| Language | Script Family | Held-Out Scans | Clean Baseline CER (WER) | BhartiOCR CER (WER) | Relative Error Reduction |
+|---|---|:---:|:---:|:---:|:---:|
+| **Hindi** | Devanagari | 228 | 0.9276 (0.9697) | **0.8781** (0.9721) | **+5.3%** |
+| **Bengali** | Bengali | 271 | 0.9095 (0.9841) | **0.8515** (0.9808) | **+6.4%** |
+| **Tamil** | Tamil | 299 | 0.9737 (0.9992) | **0.9330** (0.9990) | **+4.2%** |
+| **Urdu** | Perso-Arabic | 385 | 0.8851 (0.9987) | **0.8593** (0.9975) | **+2.9%** |
+| **Macro Mean** | **4 Script Families** | **1,183** | **0.9240** (0.9879) | **0.8805** (0.9874) | **+4.7%** |
+
+> **Caveat & Scope:** This preliminary experiment compares the full BhartiOCR pipeline (incorporating HarfBuzz CTL shaping, font-metric vertical zone padding, and the 54-operator degradation engine) against a simple clean synthetic renderer; it demonstrates preliminary full-pipeline utility on historical scans, but does not isolate degradation alone from typography or layout factors. All Sarvam evaluation scans remained strictly held out from training (0 Sarvam images used for training).
+
+For complete experimental methodology, pilot study data, ablation protocols, and reproducibility scripts, see the [BhartiOCR Research Paper](https://github.com/Faizaniqbal52/IndicOCR/blob/main/paper/bhartiocr_paper.md) and [Experiment Runner](https://github.com/Faizaniqbal52/IndicOCR/blob/main/qa/v1.0/run_4lang_controlled_experiment.py).
+
+---
+
+## 13. WebDataset Structure & Streaming
+
+BhartiOCR archives use the POSIX WebDataset `.tar` format. Each sample shares a common key prefix:
+* `{sample_key}.webp`: WebP encoded image (`quality=85`)
+* `{sample_key}.json`: UTF-8 JSON metadata record
+
+### 13.1 Shard Organization on Hugging Face Hub
+
+All 5,700 WebDataset archives are partitioned by language into subdirectories under `data/{language}/` (see [Section 5.1](#51-full-71-language-master-inventory) for individual directory mappings). Within each language directory, shards follow the standard naming convention:
+
+```
+data/{language}/{lang}_train_{shard:05d}.tar
+```
+
+Each shard contains exactly 5,000 paired `.webp` and `.json` instances (e.g., `data/kannada/kan_train_00000.tar` contains samples `kan_0000000` through `kan_0004999`).
+
+### 13.2 Direct HTTP Streaming Example (PyTorch + WebDataset)
 
 ```python
+import json
 import webdataset as wds
 from torch.utils.data import DataLoader
 
-# Stream Kannada shards directly from Hugging Face Hub
+# Define shard URL pattern (e.g., Kannada shards on Hugging Face Hub)
 shard_url = "https://huggingface.co/datasets/Faizaniqbal/BhartiOCR/resolve/main/data/kannada/kan_train_{00000..00099}.tar"
 
+# Stream shards over HTTP without downloading the full dataset
 dataset = (
-    wds.WebDataset(shard_url, resampled=False, shardshuffle=True)
+    wds.WebDataset(shard_url, shardshuffle=True, resampled=False)
     .shuffle(1000)
     .decode("pil")
     .to_tuple("webp", "json")
@@ -359,116 +493,122 @@ dataset = (
 
 dataloader = DataLoader(dataset, batch_size=32, num_workers=4)
 
-for images, annotations in dataloader:
-    # Forward pass to Vision-Language Model / TrOCR / Donut
-    pass
+for images, json_bytes_or_dicts in dataloader:
+    # images: list of PIL Images
+    # json_bytes_or_dicts: paired metadata records with text and bboxes
+    for img, meta in zip(images, json_bytes_or_dicts):
+        if isinstance(meta, (bytes, str)):
+            meta = json.loads(meta)
+        print(f"Sample: {meta['sample_key']}, Lang: {meta['lang']}, Tier: {meta['tier']}")
+        print(f"Text: {meta['text']}")
+        print(f"Tokens: {len(meta['tokens'])}, Canvas: {meta['canvas_size']}")
+    break
 ```
 
 ---
 
-## 12. Quality Assurance & Validation Statistics
+## 14. Recommended Dataset Splitting
 
-The pipeline enforces an automated verification suite across all generated shards:
+All 5,700 shards published on the Hugging Face Hub carry `_train_` filenames (e.g., `hin_train_00000.tar` through `hin_train_00199.tar`). There are currently **no separate physical validation or test archives** published on the Hub.
 
-| Validation Category | Verification Criterion | Enforcement Mechanism | Measured Failure Rate |
-|---|---|---|:---:|
-| **Unicode NFC Normalization** | Zero unmapped control codes, joiner preservation | `unicodedata.normalize('NFC', text)` | 0.00% (0 / 13.25M) |
-| **Missing Glyph Detection** | Zero `.notdef` tofu glyphs rendered | Pre-render `cmap` table lookup | 0.00% (0 / 13.25M) |
-| **CTL Ligature Integrity** | Valid conjunct formation and reordering | HarfBuzz OpenType shaping engine | 0.00% (0 / 13.25M) |
-| **Vertical Ink Containment** | Ascenders and descenders strictly within canvas | Font-specific metric padding | 0.00% (0 / 13.25M) |
-| **Bounding Box Alignment** | Token bboxes strictly match rendered ink | Ink mask connected-component audit | 0.00% (0 / 13.25M) |
-| **Cross-Language Purity** | Zero out-of-domain foreign stopwords | Lexicon exclusion gate per script | 0.00% (0 / 13.25M) |
-| **Archive Serialization** | Valid tar format with paired WebP and JSON files | POSIX archive checksum audit | 0.00% (0 / 2,650) |
+Researchers conducting evaluation should create deterministic partitions by slicing shard indices within each language folder:
 
----
+### 14.1 Deterministic Shard Slicing Guide (~90% Train / ~5% Validation / ~5% Test)
 
-## 13. Data Sources and Provenance
+| Language Allocation | Total Shards | Train Partition | Validation Partition | Test Partition |
+|---|:---:|---|---|---|
+| **200-Shard Languages** (`hin, mar, urd, ben, tam` — 5 languages) | 200 | Shards `00000..00179` (180 shards, 900K — 90%) | Shards `00180..00189` (10 shards, 50K — 5%) | Shards `00190..00199` (10 shards, 50K — 5%) |
+| **100-Shard Languages** (28 languages) | 100 | Shards `00000..00089` (90 shards, 450K — 90%) | Shards `00090..00094` (5 shards, 25K — 5%) | Shards `00095..00099` (5 shards, 25K — 5%) |
+| **50-Shard Languages** (38 languages) | 50 | Shards `00000..00043` (44 shards, 220K — 88%) | Shards `00044..00046` (3 shards, 15K — 6%) | Shards `00047..00049` (3 shards, 15K — 6%) |
 
-Textual content was sourced from open-access corpora:
+*(Note: For 50-shard languages, integer shard quantization yields an approximate 88% train / 6% validation / 6% test partition).*
 
-| Source | Role | Languages | Primary License | Processing Notes |
-|---|---|---|:---:|---|
-| **Wikimedia Foundation** | Encyclopedic prose, general vocabulary | Major Indic languages | CC BY-SA 3.0 / 4.0 | Automated markup removal, sentence chunking, stopword filtering |
-| **IIT Bombay Parallel Corpus** | Multi-domain sentences, legal and technical text | Hindi | Open Academic | Sentences partitioned into lines and paragraph blocks |
-| **Tatoeba Project (Sarvam AI)** | Conversational dialogues, short sentences | Regional languages | CC BY 2.0 FR | Cleaned short-line extraction |
-| **GlotCC-V1 (LMU Munich)** | Web crawl text for low-resource languages | Dialects, regional | Open Web / CC0 | Script purity filtering, foreign stopword removal |
-| **Public Domain Literature** | Classical verse, poetry dohas | Hindi, Sanskrit, Awadhi | Public Domain | Preserved traditional meter and danda punctuation |
+* **Leakage Considerations**: Because upstream source texts were partitioned sequentially into shards, researchers requiring strictly leak-free linguistic evaluation sets should apply document-level deduplication or hash-based text filtering across split boundaries.
 
 ---
 
-## 14. Intended Uses and Out-of-Scope Use
+## 15. Provenance & Licensing
 
-### 14.1 Intended Use Cases
-* **OCR Model Pretraining and Fine-Tuning:** Training Vision-Language Models (e.g., Florence-2, Qwen2-VL, Donut, TrOCR) on complex Indic scripts.
-* **Document Layout Analysis:** Multi-column reading order and paragraph segmentation research.
-* **Synthetic-to-Real Domain Adaptation:** Evaluating model transferability between clean and physically degraded documents.
-* **Typographic Robustness Studies:** Benchmarking OCR resilience against ink bleed, font variation, and physical paper damage.
+BhartiOCR incorporates multiple components with distinct licensing conditions:
 
-### 14.2 Out-of-Scope Uses
-* Evaluating real-world performance solely on synthetic metrics without testing on naturally scanned document collections.
-* Automated legal, medical, or administrative decision-making based on OCR predictions without human-in-the-loop review.
-* Demographic, identity, or author inference from rendered text contents.
+### 15.1 License Framework
 
----
+| Component | Source / Typology | Governing License | Terms & Notes |
+|---|---|:---:|---|
+| **Pipeline Code & Orchestration** | BhartiOCR Engine | **Apache-2.0** | Permissive open-source; modification and distribution permitted. |
+| **Metadata & Annotations** | BhartiOCR Annotation Schema | **Apache-2.0** | Token bounding boxes and pipeline metadata released under Apache-2.0. |
+| **Typography & Fonts** | Open-source typefoundries | **SIL OFL 1.1 / GPL+FE** | Permissive open-source font licenses allowing embedding and bundling. |
+| **Upstream Text (General Prose)** | Open multilingual text corpora | **CC-BY-SA 3.0 / 4.0** | Attribution; ShareAlike conditions apply to derived textual works. |
+| **Upstream Text (Literature & Poetry)**| Open cultural anthologies | **Public Domain / MIT** | Free cultural and academic reuse. |
+| **Upstream Text (Dialogue & Transcripts)** | Open research speech/dialogue | **CC-BY-4.0** | Attribution required. |
+| **Upstream Text (Technical & Parallel)** | Academic parallel corpora | **Non-Commercial Research** | Certain upstream technical sentence slices carry non-commercial research conditions (e.g., CC-BY-NC-SA 4.0). |
 
-## 15. Limitations
-
-* **Synthetic-to-Real Domain Gap:** While the degradation pipeline simulates paper fibers, ink bleeding, and physical defects, synthetic data cannot reproduce all anomalies found in natural historical scans.
-* **Text Source Dependence:** Lexical diversity is bounded by the underlying text corpora (Wikipedia, GlotCC, Tatoeba, CFILT).
-* **Font Coverage:** Visual diversity is determined by the open-source font pool available per script.
-* **Language Volume Differences:** Sample counts vary between major regional languages (1,000,000 samples) and lower-resource languages (250,000 samples).
-* **Synthetic Evaluation Interpretation:** Benchmark scores achieved on synthetic test splits should not be interpreted as direct proxies for performance on fragile historical manuscripts.
+### 15.2 Licensing and Commercial Compliance Notice
+* **License Differentiation**: While the synthesis codebase and generated metadata are licensed under Apache-2.0, the underlying textual data includes diverse public and academic corpora. Certain upstream textual source subsets carry non-commercial research licenses (e.g., CC-BY-NC-SA 4.0).
+* **Downstream Responsibility**: BhartiOCR makes no legal assertion that synthetic rendering or rasterization eliminates upstream copyright or licensing restrictions. Downstream users intending to utilize trained models in commercial settings must independently review upstream corpus terms and, where necessary, filter out subsets derived from non-commercial upstream sources.
+* **Hugging Face Hub Metadata**: Categorized under `license: other` to reflect this multi-tier licensing framework.
 
 ---
 
-## 16. Licensing and Access
+## 16. Reproducibility
 
-### 16.1 Dataset License
-BhartiOCR is released under the **Apache License 2.0**. Use of the dataset is subject to the licensing terms and redistribution requirements of the upstream textual resources used during corpus generation.
-
-### 16.2 Access Policy
-The dataset is hosted on the Hugging Face Hub under **gated access**. Users must agree to standard terms and share contact information prior to accessing the files.
-
----
-
-## 17. Versioning
-
-| Version | Release Date | Samples | Languages | Description |
-|---|:---:|:---:|:---:|---|
-| **v1.0** | Current | 13,250,000 | 23 | Initial release covering 22 Eighth Schedule languages + Bhojpuri |
-| **v1.1** | Planned | 15,250,000 | 27 | Planned expansion to Tier-2 regional languages (see Roadmap) |
+* **Deterministic Framing**: The dataset generation is **pseudo-deterministic**.
+* **Seed Configuration**: The pipeline initializes Python `random.seed(42)` and NumPy `np.random.seed(42)` at worker start.
+* **Reproducibility Scope**: Parallel worker pools execute independent shard tasks without per-sample PRNG re-anchoring. Consequently, re-running generation produces statistically and structurally consistent datasets (identical tier distributions, font allocations, and degradation categories), but individual rendered pixel arrays are not guaranteed to be bitwise pixel-identical.
+* **Environment**: Built using Python 3.10–3.12 with `uharfbuzz==0.39.3`, `freetype-py==2.4.0`, `Pillow>=10.0.0`, `opencv-python>=4.8.0`, and `fonttools>=4.42.0`.
 
 ---
 
-## 18. Roadmap
+## 17. Limitations
 
-The following features are under active development and are not part of the v1.0 release:
+Researchers and practitioners should consider the following technical boundaries:
 
-* **Regional Language Expansion (v1.1):** Adding 4 Tier-2 Devanagari regional languages—**Awadhi (`awa`)**, **Magahi (`mag`)**, **Chhattisgarhi (`hne`)**, and **Marwari / Rajasthani (`mwr`)** (+2,000,000 samples, target: 27 languages). Cloud smoke test verified.
-* **Archival Era Physics Simulation:** Specialized historical degradation profiles simulating 1850s lithographs, 1895 colonial gazettes, 1910s pre-independence literary anthologies, and 1947 newsprint broadsheets.
-* **Model Baseline Leaderboard:** Standardized evaluation benchmark assessing OCR performance (CER, WER, Bounding Box IoU) across Florence-2, Qwen2-VL, TrOCR, Nougat, and Donut.
-* **Interactive Dataset Inspector:** Hugging Face Space for live WebDataset shard browsing, token bounding box overlay inspection, and ground truth text validation.
+1. **Synthetic Document Nature**: Although the degradation engine simulates paper fibers, ink bleeding, and photographic noise, synthetic images cannot reproduce all idiosyncratic physical anomalies found in natural historical manuscripts (e.g., uneven hand-carved woodblocks, physical water submersion, parchment buckling).
+2. **Lossy WebP Compression**: Images are encoded as WebP with `quality=85`. They are not lossless rasters. High-frequency pixel noise undergoes mild lossy compression.
+3. **Advance-Width Bounding Boxes**: Serialized bounding boxes `[x0, y0, x1, y1]` are logical token bounding cells derived from HarfBuzz cumulative advance widths and font metric vertical bounds. They do not represent tight connected-component ink contours, character-level boxes, or conjunct-level boxes.
+4. **Transform/Geometry Invariance Limitation**: The degradation function `apply_micro_tilt()` applies small affine rotations (±1.0°) to image rasters without recomputing serialized bounding box coordinates. Bounding boxes in micro-tilted samples retain their pre-rotation coordinates.
+5. **Absence of Pre-Split Validation/Test Archives**: All 5,700 shards are published with `_train_` filenames on the Hub. Users must implement programmatic shard slicing to create held-out validation and test sets.
+6. **Degradation Library vs. Production Subset**: While the reference library documents 54 operators, the high-throughput production cloud runner executed a controlled subset (12 substrates, ink bleed, and 7 active transforms).
+7. **Linguistic Corpus Boundaries**: Lexical diversity is bounded by the source corpora (Wikipedia, OSCAR, Tatoeba, government gazettes). Modern colloquial slang, conversational chat acronyms, and non-standard orthography may be underrepresented.
+
+---
+
+## 18. Intended Uses
+
+### 18.1 Supported Research & Modeling Use Cases
+* **Multilingual OCR Pretraining**: Large-scale visual pretraining for encoder-decoder models (TrOCR, CRNN, Donut, Nougat, Florence-2, Qwen2-VL) across South Asian writing systems.
+* **Document Layout & Reading-Order Research**: Intended research exploring layout parsing, multi-column reading order, and block decomposition on broadsheets (Tier 1) and paragraphs (Tier 2). Serialized annotations reflect logical token layout zones rather than semantic segmentation masks or dedicated layout-benchmark labels.
+* **Token Localization Research**: Exploring token boundary detection, reading-line baseline tracking, and word-level localization. Bounding boxes are derived from HarfBuzz advances and font metrics rather than tight polygon ink ground truth.
+* **Controlled Robustness Research**: Evaluating model resilience against ink bleed, paper discoloration, stamps, and sensor noise under controlled parameter sweeps.
+* **Transfer Learning & Fine-Tuning**: Adapting pre-trained vision models to low-resource South Asian languages (e.g., Bodo, Santali, Manipuri, Tulu, Newari).
+
+### 18.2 Out-of-Scope Uses
+* Evaluating real-world OCR performance solely against synthetic metrics without evaluating on naturally scanned document collections.
+* Automated extraction of legal, clinical, or identity data without human verification.
+* Demographic, religious, or identity profiling based on synthetic text contents.
 
 ---
 
 ## 19. Citation
 
-If you utilize BhartiOCR in your research or applications, please cite:
+If you use BhartiOCR in your research, please cite:
 
 ```bibtex
 @dataset{bhartiocr_2026,
-  author    = {Faizan Iqbal},
-  title     = {BhartiOCR: A Multilingual Synthetic OCR and Document Benchmark for Indian Languages},
-  year      = {2026},
-  publisher = {Hugging Face},
-  url       = {https://huggingface.co/datasets/Faizaniqbal/BhartiOCR}
+  author       = {Faizan Iqbal},
+  title        = {BhartiOCR: A Large-Scale Synthetic Corpus for Pan-Indic Document AI and Multilingual OCR},
+  year         = {2026},
+  publisher    = {Hugging Face},
+  url          = {https://huggingface.co/datasets/Faizaniqbal/BhartiOCR}
 }
 ```
 
 ---
 
-## 20. Contact and Feedback
+## 20. Dataset Maintenance & Inquiries
 
-* **Author:** Faizan Iqbal
-* **Repository:** [https://huggingface.co/datasets/Faizaniqbal/BhartiOCR](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR)
-* For questions, corrections, or reproducibility inquiries, please open a discussion on the [Hugging Face Repository Discussion Board](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR/discussions).
+BhartiOCR is actively maintained by Faizan Iqbal.
+
+* **Repository Inquiries & Issues**: For questions regarding shard integrity, script support, or annotations, please open a discussion on the [Hugging Face Discussion Board](https://huggingface.co/datasets/Faizaniqbal/BhartiOCR/discussions).
+* **Author / Maintainer**: Faizan Iqbal ([@Faizaniqbal](https://huggingface.co/Faizaniqbal))
+
