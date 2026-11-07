@@ -1,6 +1,6 @@
-# IndicPixel Master Augmentation Registry
+# BhartiOCR Augmentation Registry
 
-This registry provides a complete, itemized record of all **54 augmentations** active across the IndicPixel OCR synthesis pipeline, spanning procedural paper substrates, physical degradation operators, ancient scripture decay cycles, geometric sensor transformations, and kinematic handwriting deformations.
+This registry is an itemized record of the **54 augmentations** in the BhartiOCR synthesis code. Not every generator version uses all of them. They span procedural paper substrates, physical degradation operators, ancient scripture decay cycles, geometric sensor transformations, and kinematic handwriting deformations.
 
 ---
 
